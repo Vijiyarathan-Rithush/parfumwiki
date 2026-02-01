@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@theme {
+  --color-sidebar: #003A18;
+  --color-topbar: #598F82;
+  --color-title: #FFFFFF;
+  --color-bg: #E5E1DD;
+  --color-textmain: #074540;
+}
+
+html {
+  font-size: 32px; 
+}
