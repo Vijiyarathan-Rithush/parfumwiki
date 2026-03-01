@@ -15,7 +15,7 @@ function slugify(input: string) {
     .replace(/ü/g, "ue")
     .replace(/ß/g, "ss")
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
+    .replace(/^-+|-+$/g, "");
 }
 
 export function AddPerfumeForm({ onSubmit, onCancel }: Props) {

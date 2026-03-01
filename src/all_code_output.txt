@@ -1,16 +1,5 @@
 ===== Combined File Export ===== 
-Generated on 01.03.2026 17:17:56.83 
- 
----------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\App.tsx 
----------------------------------------- 
-import { RouterProvider } from "react-router-dom";
-import { router } from "./router";
-
-export function App() {
-  return <RouterProvider router={router} />;
-}
- 
+Generated on 01.03.2026 18:14:30.62 
  
 ---------------------------------------- 
 FILE: F:\Projects\parfumwiki\src\main.tsx 
@@ -25,53 +14,6 @@ createRoot(document.getElementById("root")!).render(
     <App />
   </StrictMode>
 );
- 
- 
----------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\App.css 
----------------------------------------- 
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
  
  
 ---------------------------------------- 
@@ -115,6 +57,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "../layouts/AppLayout";
 import { HomePage } from "../pages/HomePage";
 import { PerfumeListPage } from "../pages/PerfumeListPage";
+import { PerfumeDetailPage } from "../pages/PerfumeDetailPage";
 
 
 export const router = createBrowserRouter([
@@ -123,7 +66,8 @@ export const router = createBrowserRouter([
     element: <AppLayout />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "perfumes", element: <PerfumeListPage /> }
+      { path: "perfumes", element: <PerfumeListPage /> },
+      { path: "perfumes/:slug", element: <PerfumeDetailPage/>},
     ],
   },
 ]);
@@ -166,7 +110,7 @@ function slugify(input: string) {
     .replace(/ü/g, "ue")
     .replace(/ß/g, "ss")
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
+    .replace(/^-+|-+$/g, "");
 }
 
 export function AddPerfumeForm({ onSubmit, onCancel }: Props) {
@@ -257,6 +201,7 @@ FILE: F:\Projects\parfumwiki\src\features\perfumes\components\NotesPanel.tsx
 ---------------------------------------- 
 FILE: F:\Projects\parfumwiki\src\features\perfumes\components\PerfumeCard.tsx 
 ---------------------------------------- 
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export type PerfumeCardModel = {
@@ -267,18 +212,23 @@ export type PerfumeCardModel = {
 };
 
 export function PerfumeCard({ perfume }: { perfume: PerfumeCardModel }) {
+  const [broken, setBroken] = useState(false);
+  const showImage = perfume.imageUrl && !broken;
+
   return (
     <Link
       to={`/perfumes/${perfume.slug}`}
       className="block rounded-xl bg-white/60 p-4 shadow-sm ring-1 ring-black/5 transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="aspect-[4/3] w-full overflow-hidden rounded-lg bg-black/5">
-        {perfume.imageUrl ? (
+        {showImage ? (
           <img
             src={perfume.imageUrl}
             alt={`${perfume.brand} ${perfume.name}`}
             className="h-full w-full object-cover"
             loading="lazy"
+            decoding="async"
+            onError={() => setBroken(true)}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-sm text-black/50">
@@ -293,13 +243,73 @@ export function PerfumeCard({ perfume }: { perfume: PerfumeCardModel }) {
       </div>
     </Link>
   );
-}
- 
+} 
  
 ---------------------------------------- 
 FILE: F:\Projects\parfumwiki\src\features\perfumes\components\RatingBars.tsx 
 ---------------------------------------- 
  
+ 
+---------------------------------------- 
+FILE: F:\Projects\parfumwiki\src\features\perfumes\hooks\usePerfumes.ts 
+---------------------------------------- 
+import { useEffect, useState } from "react";
+import type { Perfume } from "../types";
+import { loadPerfumes, savePerfumes } from "../model/storage";
+
+const STARTER: Perfume[] = [
+  {
+    id: "1",
+    slug: "giardini-di-toscana-bianco-latte",
+    brand: "Giardini Di Toscana",
+    name: "Bianco Latte",
+  },
+];
+
+export function usePerfumes() {
+  const [perfumes, setPerfumes] = useState<Perfume[]>(() => loadPerfumes(STARTER));
+
+  useEffect(() => {
+    savePerfumes(perfumes);
+  }, [perfumes]);
+
+  function addPerfume(perfume: Perfume) {
+    setPerfumes((prev) => [perfume, ...prev]);
+  }
+
+  function removePerfume(id: string) {
+    setPerfumes((prev) => prev.filter((p) => p.id !== id));
+  }
+
+  return { perfumes, addPerfume, removePerfume, setPerfumes };
+} 
+ 
+---------------------------------------- 
+FILE: F:\Projects\parfumwiki\src\features\perfumes\model\storage.ts 
+---------------------------------------- 
+import type { Perfume } from "../types";
+
+const STORAGE_KEY = "parfumwiki.perfumes";
+
+export function loadPerfumes(fallback: Perfume[] = []): Perfume[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw) as Perfume[];
+    if (!Array.isArray(parsed)) return fallback;
+    return parsed;
+  } catch {
+    return fallback;
+  }
+}
+
+export function savePerfumes(perfumes: Perfume[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(perfumes));
+  } catch {
+    // ignore
+  }
+} 
  
 ---------------------------------------- 
 FILE: F:\Projects\parfumwiki\src\features\perfumes\pages\PerfumeDetailPage.tsx 
@@ -401,59 +411,66 @@ export function HomePage() {
  
  
 ---------------------------------------- 
+FILE: F:\Projects\parfumwiki\src\pages\PerfumeDetailPage.tsx 
+---------------------------------------- 
+import { Link, useParams } from "react-router-dom";
+import { usePerfumes } from "../features/perfumes/hooks/usePerfumes";
+
+export function PerfumeDetailPage() {
+  const { slug } = useParams();
+  const { perfumes } = usePerfumes();
+
+  const perfume = perfumes.find((p) => p.slug === slug);
+
+  if (!perfume) {
+    return (
+      <section className="w-full px-8">
+        <p className="text-lg">Perfume not found.</p>
+        <Link to="/perfumes" className="mt-4 inline-block underline">
+          Back to list
+        </Link>
+      </section>
+    );
+  }
+
+  return (
+    <section className="w-full px-8 space-y-4">
+      <Link to="/perfumes" className="inline-block underline">
+        ← Back
+      </Link>
+
+      <h2 className="text-4xl font-extrabold tracking-tight">{perfume.name}</h2>
+      <p className="text-lg text-textmain/80">{perfume.brand}</p>
+
+      {perfume.imageUrl ? (
+        <img
+          src={perfume.imageUrl}
+          alt={`${perfume.brand} ${perfume.name}`}
+          className="max-w-xl rounded-2xl ring-1 ring-black/10"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : null}
+    </section>
+  );
+} 
+ 
+---------------------------------------- 
 FILE: F:\Projects\parfumwiki\src\pages\PerfumeListPage.tsx 
 ---------------------------------------- 
-import { useEffect, useState } from "react";
-import type { Perfume } from "../features/perfumes/types";
+import { useState } from "react";
 import { PerfumeCard } from "../features/perfumes/components/PerfumeCard";
 import { Modal } from "../shared/ui/Modal";
 import { AddPerfumeForm } from "../features/perfumes/components/AddPerfumeForm";
-
-const STORAGE_KEY = "parfumwiki.perfumes";
-
-const STARTER: Perfume[] = [
-  { id: "1", slug: "giardini-di-toscana-bianco-latte", brand: "Giardini Di Toscana", name: "Bianco Latte" },
-];
+import { usePerfumes } from "../features/perfumes/hooks/usePerfumes";
 
 export function PerfumeListPage() {
-  const [perfumes, setPerfumes] = useState<Perfume[]>(STARTER);
+  const { perfumes, addPerfume } = usePerfumes();
   const [open, setOpen] = useState(false);
-
-  // optional: persist locally
-  useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try {
-        setPerfumes(JSON.parse(raw) as Perfume[]);
-      } catch {
-        // ignore
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(perfumes));
-  }, [perfumes]);
 
   return (
     <section className="w-full px-8">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <h2 className="text-4xl font-extrabold tracking-tight text-textmain">
-            Our perfumes
-          </h2>
-          <p className="mt-2 text-lg text-textmain/80">
-            Add perfumes and build your collection.
-          </p>
-        </div>
-
-        <button
-          onClick={() => setOpen(true)}
-          className="rounded-xl bg-topbar px-4 py-2 font-semibold text-title hover:opacity-95"
-        >
-          + Add perfume
-        </button>
-      </div>
+      {/* header… */}
 
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {perfumes.map((p) => (
@@ -465,15 +482,14 @@ export function PerfumeListPage() {
         <AddPerfumeForm
           onCancel={() => setOpen(false)}
           onSubmit={(perfume) => {
-            setPerfumes((prev) => [perfume, ...prev]);
+            addPerfume(perfume);
             setOpen(false);
           }}
         />
       </Modal>
     </section>
   );
-}
- 
+} 
  
 ---------------------------------------- 
 FILE: F:\Projects\parfumwiki\src\shared\hooks\useMediaQuery.ts 
