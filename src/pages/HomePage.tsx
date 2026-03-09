@@ -4,7 +4,7 @@ export function HomePage() {
   return (
     <section className="w-full px-8 space-y-6">
       <h2 className="text-4xl font-extrabold tracking-tight">
-        Welcome to the ParfümWiki! Done with AWS
+        Welcome to the ParfümWiki! 
       </h2>
 
       <p className="max-w-4xl text-lg leading-relaxed">
