@@ -1,5 +1,5 @@
 ===== Combined File Export ===== 
-Generated on 01.03.2026 18:14:30.62 
+Generated on 01.03.2026 21:46:32.88 
  
 ---------------------------------------- 
 FILE: F:\Projects\parfumwiki\src\main.tsx 
@@ -46,11 +46,6 @@ export function App() {
  
  
 ---------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\app\providers.tsx 
----------------------------------------- 
- 
- 
----------------------------------------- 
 FILE: F:\Projects\parfumwiki\src\app\router.tsx 
 ---------------------------------------- 
 import { createBrowserRouter } from "react-router-dom";
@@ -83,11 +78,6 @@ export type Perfume = {
   brand: string;
   imageUrl?: string;
 };
- 
- 
----------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\features\perfumes\api\perfumeApi.ts 
----------------------------------------- 
  
  
 ---------------------------------------- 
@@ -194,11 +184,6 @@ export function AddPerfumeForm({ onSubmit, onCancel }: Props) {
  
  
 ---------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\features\perfumes\components\NotesPanel.tsx 
----------------------------------------- 
- 
- 
----------------------------------------- 
 FILE: F:\Projects\parfumwiki\src\features\perfumes\components\PerfumeCard.tsx 
 ---------------------------------------- 
 import { useState } from "react";
@@ -244,11 +229,6 @@ export function PerfumeCard({ perfume }: { perfume: PerfumeCardModel }) {
     </Link>
   );
 } 
- 
----------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\features\perfumes\components\RatingBars.tsx 
----------------------------------------- 
- 
  
 ---------------------------------------- 
 FILE: F:\Projects\parfumwiki\src\features\perfumes\hooks\usePerfumes.ts 
@@ -310,16 +290,6 @@ export function savePerfumes(perfumes: Perfume[]) {
     // ignore
   }
 } 
- 
----------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\features\perfumes\pages\PerfumeDetailPage.tsx 
----------------------------------------- 
- 
- 
----------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\features\perfumes\pages\PerfumeListPage.tsx 
----------------------------------------- 
- 
  
 ---------------------------------------- 
 FILE: F:\Projects\parfumwiki\src\layouts\AppLayout.tsx 
@@ -492,26 +462,6 @@ export function PerfumeListPage() {
 } 
  
 ---------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\shared\hooks\useMediaQuery.ts 
----------------------------------------- 
- 
- 
----------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\shared\ui\Button.tsx 
----------------------------------------- 
- 
- 
----------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\shared\ui\Card.tsx 
----------------------------------------- 
- 
- 
----------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\shared\ui\Chip.tsx 
----------------------------------------- 
- 
- 
----------------------------------------- 
 FILE: F:\Projects\parfumwiki\src\shared\ui\Modal.tsx 
 ---------------------------------------- 
 import { useEffect } from "react";
@@ -571,58 +521,5 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
     </div>
   );
 }
- 
- 
----------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\shared\ui\ProgressBar.tsx 
----------------------------------------- 
- 
- 
----------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\shared\ui\Toasts.tsx 
----------------------------------------- 
-import { useEffect } from "react";
-
-export type ToastType = "success" | "error" | "info";
-
-type ToastProps = {
-  message: string;
-  type?: ToastType;
-  onClose: () => void;
-  duration?: number;
-};
-
-export function Toast({
-  message,
-  type = "success",
-  onClose,
-  duration = 3000,
-}: ToastProps) {
-  useEffect(() => {
-    const id = setTimeout(onClose, duration);
-    return () => clearTimeout(id);
-  }, [duration, onClose]);
-
-  return (
-    <div className="toast toast-end toast-bottom z-50">
-      <div
-        className={`alert ${
-          type === "success"
-            ? "alert-success"
-            : type === "error"
-            ? "alert-error"
-            : "alert-info"
-        }`}
-      >
-        <span>{message}</span>
-      </div>
-    </div>
-  );
-}
- 
- 
----------------------------------------- 
-FILE: F:\Projects\parfumwiki\src\shared\utils\formatters.ts 
----------------------------------------- 
  
  
